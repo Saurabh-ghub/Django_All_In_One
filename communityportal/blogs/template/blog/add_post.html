@@ -1,0 +1,20 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+{% if message %}
+{{message}}
+{% endif %}
+
+<div class="col-sm-10">
+<h3 class="text-white my-5">Dashboard/Add Post</h3>
+<form action='{% url 'add_post'  %}' method="post" >
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Add" class="btn btn-success">
+
+</form>
+<a href='{% url 'dashboard' %}' class = "btn btn-danger">Cancel</a>
+
+</div>
+
+{% endblock content %}
