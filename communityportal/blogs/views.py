@@ -16,7 +16,7 @@ def contact(request):
     return render(request,'blog/contact.html')
 def user_logout(request):
     logout(request)
-    return redirect('contact')
+    return redirect('home')
 def user_login(request):
     
         if request.method=='POST':
@@ -57,7 +57,7 @@ def signup(request):
                  else:
                     user= User.objects.create_user(username=uname,first_name=fname,last_name=lname,email=email,password=p1)
                     user.save()
-           #adding to author group
+           # adding to author group
                     group=Group.objects.get(name='Author')
                     user.groups.add(group)
                     return redirect('user_login')
@@ -69,19 +69,27 @@ def signup(request):
         return render(request,'blog/signup.html')
 def dashboard(request):
     if request.user.is_authenticated:
-        posts=Posts.objects.all()
-        return render(request,'blog/dashboard.html',{'posts':posts})
+        user=request.user
+        posts=Posts.objects.filter(user=user)
+        #adding users view
+        
+        fname = user.get_full_name()
+        gps = user.groups.all()
+        return render(request,'blog/dashboard.html',{'posts':posts,'fname':fname,'groups':gps})
     else:
        return redirect('user_login')
 
 def add_post(request):
     if request.user.is_authenticated:
+        user=request.user
         if request.method == 'POST':
             form=PostForm(request.POST)
             if form.is_valid():
                 title=form.cleaned_data['title']
                 desc=form.cleaned_data['description']
                 pst=Posts(title=title,description=desc)
+               # pst.save(commit=False)#modify here
+                pst.user=user#added user
                 pst.save()
                 form=PostForm()
                 message="Succesfully added"
